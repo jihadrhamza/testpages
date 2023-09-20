@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Details</title>
+</head>
+<body>
+    <h1>Location Details</h1>
+    <button id="getLocationBtn">Get Location Details</button>
+
+    <div id="locationDetails">
+        <p>Latitude: <span id="latitude"></span></p>
+        <p>Longitude: <span id="longitude"></span></p>
+        <p>Location: <span id="location"></span></p>
+    </div>
+
+    <script>
+        const getLocationBtn = document.getElementById("getLocationBtn");
+        const latitudeElement = document.getElementById("latitude");
+        const longitudeElement = document.getElementById("longitude");
+        const locationElement = document.getElementById("location");
+
+        // Function to get location details
+        function getLocationDetails() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // Update HTML elements with latitude and longitude
+                    latitudeElement.textContent = latitude.toFixed(6);
+                    longitudeElement.textContent = longitude.toFixed(6);
+
+                    // Use Google Geocoding API to get location details based on latitude and longitude
+                    const geocodeApiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCcvcCwv69jC3phNGu0aXRWYnDmbdwEZaY`;
+
+                    fetch(geocodeApiUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.results && data.results.length > 0) {
+                                // Display the formatted address as location
+                                const formattedAddress = data.results[0].formatted_address;
+                                locationElement.textContent = formattedAddress;
+                            } else {
+                                locationElement.textContent = "Location not found";
+                            }
+                        })
+                        .catch(error => {
+                            locationElement.textContent = "Error getting location details";
+                            console.error(error);
+                        });
+                }, function(error) {
+                    alert(`Error getting location: ${error.message}`);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Attach a click event listener to the button
+        getLocationBtn.addEventListener("click", getLocationDetails);
+    </script>
+</body>
+</html>
