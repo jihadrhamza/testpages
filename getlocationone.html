@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Geocoding API</title>
+</head>
+<body>
+    <button onclick="geocodeAddress()">Geocode Address</button>
+    <div id="result"></div>
+
+    <script>
+        function geocodeAddress() {
+            const apiKey = 'AIzaSyAjoDJzpM_CRptPaWcrcMV8tD1YhRr01hI'; // Replace with your Google Maps API key
+            const address = '1600 Amphitheatre Parkway, Mountain View, CA'; // Replace with the address you want to geocode
+
+            const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Referer': window.location.href, // Replace with the referrer you want to send
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    const result = data.results[0];
+                    const formattedAddress = result.formatted_address;
+                    const location = result.geometry.location;
+                    const latitude = location.lat;
+                    const longitude = location.lng;
+                    document.getElementById('result').innerHTML = `
+                        <p>Formatted Address: ${formattedAddress}</p>
+                        <p>Latitude: ${latitude}</p>
+                        <p>Longitude: ${longitude}</p>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `Geocoding failed with status: ${data.status}`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = `Error: ${error.message}`;
+            });
+        }
+    </script>
+</body>
+</html>
